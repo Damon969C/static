@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统分类</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="details-page">
+
+    <h2 id="system-title">🔹 请选择分类</h2>
+    <a href="index.html" class="back">⬅ 返回首页</a>
+
+    <ul class="menu" id="category-container"></ul>
+
+    <script src="js/categories.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const systemId = params.get("system");
+        const systemTitle = document.getElementById("system-title");
+        const container = document.getElementById("category-container");
+
+        if (systemId && categories[systemId]) {
+            systemTitle.innerText = `🔹 ${categories[systemId].name} - 选择分类`;
+
+            categories[systemId].categories.forEach((category, index) => {
+                let listItem = document.createElement("li");
+                listItem.innerHTML = `<a href="commands.html?system=${systemId}&category=${category.id}">${index + 1}. ${category.name}</a>`;
+                container.appendChild(listItem);
+            });
+        } else {
+            systemTitle.innerText = "系统未找到";
+        }
+    </script>
+
+</body>
+</html>

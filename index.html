@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统配置文档</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="index-page">
+
+    <h2>🔹 选择系统</h2>
+    <ul class="menu" id="menu-container"></ul>
+
+    <script src="js/menu.js"></script>
+    <script>
+        const container = document.getElementById("menu-container");
+        menuItems.forEach(item => {
+            let listItem = document.createElement("li");
+            if (item.isUrl) {
+                listItem.innerHTML = '<a href="' + item.url + '" class="external-link">' + item.name + '</a>';
+            } else {
+                listItem.innerHTML = '<a href="details.html?system=' + item.id + '">' + item.name + '</a>';
+            }
+            container.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>

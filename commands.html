@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命令详情</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="commands-page">
+    <h2 id="command-title">🔹 选择命令</h2>
+    <a href="index.html" class="back">⬅ 返回首页</a>
+    <a href="#" onclick="goBack()" class="back">⬅ 返回上一级</a>
+
+    <div id="commands-container"></div>
+    
+    <!-- 当前时间显示区域 -->
+    <div id="currentTime"></div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const systemId = params.get("system");
+        const categoryId = params.get("category");
+
+        function goBack() {
+            window.history.back();
+        }
+
+        if (systemId && categoryId) {
+            const script = document.createElement("script");
+            script.src = "systems/" + systemId + "/" + categoryId + "_commands.js";
+            script.onload = function() {
+                displayCommands();
+                initCodeBlockToggle();
+            };
+            script.onerror = function() {
+                document.getElementById("command-title").innerText = "❌ 该分类没有命令";
+            };
+            document.head.appendChild(script);
+        } else {
+            document.getElementById("command-title").innerText = "❌ 分类未找到";
+        }
+
+        function displayCommands() {
+            if (typeof commandList === "undefined") {
+                document.getElementById("command-title").innerText = "❌ 没有命令";
+                return;
+            }
+
+            const container = document.getElementById("commands-container");
+            container.innerHTML = "";
+            document.getElementById("command-title").innerText = '🔹 ' + commandList.name;
+
+            if (!commandList.commands || commandList.commands.length === 0) {
+                return;
+            }
+
+            // 遍历 commandList.commands
+            commandList.commands.forEach(cmd => {
+                const commandBlock = document.createElement("div");
+
+                // 先判断是否是 "新格式"：cmd.fields 存在且是数组
+                if (cmd.fields && Array.isArray(cmd.fields)) {
+                    // === 新格式处理 ===
+                    cmd.fields.forEach(field => {
+                        // 取内容
+                        let content = field.value || "";
+                        // 如果标记 isBase64，则先解码
+                        if (field.isBase64) {
+                            content = decodeBase64(content);
+                        }
+
+                        switch (field.type) {
+                            case "desc":
+                                let descDiv = document.createElement("div");
+                                descDiv.className = "desc";
+                                descDiv.innerText = content;
+                                commandBlock.appendChild(descDiv);
+                                break;
+
+                            case "info":
+                                let infoDiv = document.createElement("div");
+                                infoDiv.className = "info";
+                                infoDiv.innerText = content;
+                                commandBlock.appendChild(infoDiv);
+                                break;
+
+                            case "code":
+                                if (Array.isArray(content)) {
+                                    // 多段代码
+                                    content.forEach(codeText => {
+                                        if (codeText.trim() !== "") {
+                                            let codeContainer = createCodeContainer(codeText);
+                                            commandBlock.appendChild(codeContainer);
+                                        }
+                                    });
+                                } else {
+                                    // 单条代码
+                                    if (content.trim() !== "") {
+                                        let codeContainer = createCodeContainer(content);
+                                        commandBlock.appendChild(codeContainer);
+                                    }
+                                }
+                                break;
+
+                            default:
+                                // 其它类型略过或自定义
+                                break;
+                        }
+                    });
+                } else {
+                    // === 旧格式处理 ===
+                    // 1) desc
+                    if (cmd.desc) {
+                        let descDiv = document.createElement("div");
+                        descDiv.className = "desc";
+                        descDiv.innerText = cmd.desc;
+                        commandBlock.appendChild(descDiv);
+                    }
+
+                    // 2) info
+                    if (cmd.info) {
+                        let infoDiv = document.createElement("div");
+                        infoDiv.className = "info";
+                        infoDiv.innerText = cmd.info;
+                        commandBlock.appendChild(infoDiv);
+                    }
+
+                    // 3) code
+                    // 可能是字符串或数组
+                    if (cmd.code) {
+                        if (Array.isArray(cmd.code)) {
+                            cmd.code.forEach(singleCode => {
+                                if (singleCode && singleCode.trim() !== "") {
+                                    let codeContainer = createCodeContainer(singleCode);
+                                    commandBlock.appendChild(codeContainer);
+                                }
+                            });
+                        } else {
+                            if (cmd.code.trim() !== "") {
+                                let codeContainer = createCodeContainer(cmd.code);
+                                commandBlock.appendChild(codeContainer);
+                            }
+                        }
+                    }
+
+                    // 4) base64Code
+                    // 也可能是字符串或数组
+                    if (cmd.base64Code) {
+                        // 处理 base64
+                        if (Array.isArray(cmd.base64Code)) {
+                            cmd.base64Code.forEach(b64 => {
+                                if (b64 && b64.trim() !== "") {
+                                    const decoded = decodeBase64(b64);
+                                    let codeContainer = createCodeContainer(decoded);
+                                    commandBlock.appendChild(codeContainer);
+                                }
+                            });
+                        } else {
+                            if (cmd.base64Code.trim() !== "") {
+                                const decoded = decodeBase64(cmd.base64Code);
+                                let codeContainer = createCodeContainer(decoded);
+                                commandBlock.appendChild(codeContainer);
+                            }
+                        }
+                    }
+                }
+
+                // 加入主容器
+                container.appendChild(commandBlock);
+            });
+        }
+
+        // 创建带复制按钮和 <pre><code> 的 code 容器
+        function createCodeContainer(codeText) {
+            let codeContainer = document.createElement("div");
+            codeContainer.classList.add("code-container");
+
+            // 复制按钮
+            let copyBtn = document.createElement("button");
+            copyBtn.className = "copy-btn";
+            copyBtn.innerText = "复制";
+            copyBtn.onclick = function() {
+                copyCode(this);
+            };
+            codeContainer.appendChild(copyBtn);
+
+            // code-content
+            let codeContent = document.createElement("div");
+            codeContent.classList.add("code-content");
+            codeContainer.appendChild(codeContent);
+
+            // <pre><code> 不用 innerHTML，避免特殊字符被解析
+            let preEl = document.createElement("pre");
+            let codeEl = document.createElement("code");
+            codeEl.textContent = codeText; // 保证原样显示
+            preEl.appendChild(codeEl);
+            codeContent.appendChild(preEl);
+
+            return codeContainer;
+        }
+
+        function copyCode(button) {
+            let codeBlock = button.parentElement.querySelector("pre code");
+            if (!codeBlock) return;
+            let code = codeBlock.innerText.replace(/\r\n/g, "\n");
+            navigator.clipboard.writeText(code)
+                .then(() => {
+                    button.innerText = "已复制!";
+                    setTimeout(() => button.innerText = "复制", 1500);
+                })
+                .catch(() => alert("复制失败，请手动复制"));
+        }
+
+        // 解码 Base64
+        function decodeBase64(base64Str) {
+            if (!base64Str || base64Str.trim() === "") {
+                return "❌ Base64 为空";
+            }
+            base64Str = base64Str.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, '');
+            while (base64Str.length % 4 !== 0) {
+                base64Str += "=";
+            }
+            try {
+                let binaryStr = atob(base64Str);
+                let bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) {
+                    bytes[i] = binaryStr.charCodeAt(i);
+                }
+                return new TextDecoder("utf-8").decode(bytes);
+            } catch (e) {
+                return "❌ Base64 解码失败";
+            }
+        }
+
+        // 折叠/展开逻辑
+        function initCodeBlockToggle(){
+            const codeContainers = document.querySelectorAll('.code-container');
+            codeContainers.forEach(container => {
+                const pre = container.querySelector(".code-content pre");
+                if (pre) {
+                    const lineCount = pre.innerText
+                      .trimEnd() // <- 新增
+                      .split("\n").length;
+                    if (lineCount > 1) {
+                        container.classList.add("collapsed");
+                        // 创建 toggle-wrapper 放在 .code-content 之后
+                        const toggleWrapper = document.createElement("div");
+                        toggleWrapper.className = "toggle-wrapper";
+                        const toggleBtn = document.createElement("button");
+                        toggleBtn.className = "toggle-btn";
+                        toggleBtn.innerText = "展开";
+                        toggleBtn.addEventListener("click", function(){
+                            container.classList.toggle("collapsed");
+                            toggleBtn.innerText = container.classList.contains("collapsed") ? "展开" : "折叠";
+                        });
+                        toggleWrapper.appendChild(toggleBtn);
+                        const codeContent = container.querySelector(".code-content");
+                        codeContent.insertAdjacentElement("afterend", toggleWrapper);
+                    }
+                }
+            });
+        }
+
+        // 显示当前时间
+        function updateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = ("0" + (now.getMonth() + 1)).slice(-2);
+            const day = ("0" + now.getDate()).slice(-2);
+            const hours = ("0" + now.getHours()).slice(-2);
+            const minutes = ("0" + now.getMinutes()).slice(-2);
+            const seconds = ("0" + now.getSeconds()).slice(-2);
+            document.getElementById("currentTime").innerText = 
+                `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+/* 🌎 全局样式与现代排版 (Apple/Vercel-inspired Glassmorphism) */
+:root {
+    --primary-color: #0070f3;
+    --primary-hover: #0051b3;
+    --bg-color: #f0f2f5;
+    --text-main: #111827;
+    --text-muted: #4b5563;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(255, 255, 255, 0.5);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --glass-blur: 16px;
+    --code-bg: rgba(17, 24, 39, 0.85);
+    --code-text: #f3f4f6;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+    background-size: cover;
+    background-attachment: fixed;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.6;
+    padding-bottom: 40px;
+}
+
+/* 背景图片展示：移除原先的白纱渐变，让图片清晰显示，配合卡片的毛玻璃效果更通透 */
+.index-page { background-image: url("../images/1.jpg"); background-size: cover; background-position: center; background-attachment: fixed; }
+.details-page { background-image: url("../images/2.jpg"); background-size: cover; background-position: center; background-attachment: fixed; }
+.commands-page { background-image: url("../images/3.jpg"); background-size: cover; background-position: center; background-attachment: fixed; }
+
+/* 主内容容器约束，让页面内容居中且美观 */
+body > h2, body > .menu, body > #commands-container {
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+body > a.back {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* 🎯 统一标题样式 */
+h2 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--text-main);
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    padding: 15px 30px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-soft);
+    margin-top: 40px;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+    display: inline-block;
+    align-self: center; /* 允许在flex容器下居中自适应宽度 */
+}
+
+body { align-items: stretch; }
+h2 { margin-left: auto; margin-right: auto; display: table; }
+
+/* ⬅ 返回按钮样式 */
+.back {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition);
+}
+.back:hover {
+    color: var(--primary-hover);
+    transform: translateX(-4px);
+}
+
+/* 🎯 菜单列表容器 (index.html & details.html) */
+.menu {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* 🎯 菜单按钮 (玻璃拟态效果) */
+.menu a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    color: var(--text-main);
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* 详情页菜单左对齐 */
+.details-page .menu a {
+    justify-content: flex-start;
+    padding-left: 25px;
+    border-left: 6px solid var(--primary-color);
+}
+
+.index-page .menu a.external-link {
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+}
+.index-page .menu a.external-link::after {
+    content: " ↗";
+    font-size: 14px;
+    color: var(--text-muted);
+    position: absolute;
+    right: 20px;
+}
+
+.menu a:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #fff;
+    color: var(--primary-color);
+}
+
+/* ================================== */
+/* 💻 命令详情页样式 (commands.html)   */
+/* ================================== */
+
+/* 🎯 描述区块 (命令说明) */
+.desc {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-soft);
+}
+
+/* 📝 额外说明文本 (Info 字段) */
+.info {
+    font-size: 15px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.6);
+    padding: 12px 16px;
+    margin-bottom: 15px;
+    border-radius: var(--radius-md);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap;
+}
+
+/* 💻 代码块容器 */
+.code-container {
+    position: relative;
+    background: var(--code-bg);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.code-container:hover {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.code-content {
+    overflow-x: auto;
+}
+
+.code-content::-webkit-scrollbar {
+    height: 8px;
+}
+.code-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+.code-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+.code-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 💡 代码块文本 */
+pre {
+    margin: 0;
+    white-space: pre; 
+}
+
+pre code {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', Consolas, Menlo, monospace;
+    font-size: 15px;
+    color: var(--code-text);
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* 📋 复制按钮 */
+.copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.copy-btn:active {
+    transform: translateY(1px);
+}
+
+/* 🌟 折叠状态逻辑 */
+.code-container.collapsed .code-content pre {
+    max-height: 1.6em; /* 一行高度 */
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to right, #000 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 80%, transparent 100%);
+}
+
+.toggle-wrapper {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.toggle-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 6px 16px;
+    cursor: pointer;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+}
+
+/* 🕒 右下角时间 */
+#currentTime {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: var(--shadow-soft);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+    h2 { font-size: 22px; padding: 12px 20px; }
+    .menu { grid-template-columns: 1fr; }
+    .code-container { padding: 15px; }
+    .copy-btn { top: 8px; right: 8px; padding: 4px 10px; font-size: 12px; }
+    #currentTime { bottom: 10px; right: 10px; font-size: 11px; padding: 6px 12px; }
+}
